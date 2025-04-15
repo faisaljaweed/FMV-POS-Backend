@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../modal/product.modal.js";
 const addProduct = asyncHandler(async (req, res) => {
   const {
-    name,
+    VenuName,
     description,
     location,
     price,
@@ -12,26 +12,26 @@ const addProduct = asyncHandler(async (req, res) => {
     standingCapacity,
     seatedCapacity,
     size,
-    features,
+    // features,
   } = req.body;
   console.log(req.body);
 
   if (
-    !name ||
+    !VenuName ||
     !description ||
     !location ||
     !price ||
     !type ||
     !standingCapacity ||
     !seatedCapacity ||
-    !size ||
-    !features
+    !size
+    // !features
   ) {
     throw new ApiError(401, "All Fields are required");
   }
 
   const property = await Product.create({
-    name,
+    VenuName,
     vendorId: req.user._id,
     description,
     location,
@@ -40,7 +40,7 @@ const addProduct = asyncHandler(async (req, res) => {
     standingCapacity,
     seatedCapacity,
     size,
-    features,
+    // features,
   });
 
   res

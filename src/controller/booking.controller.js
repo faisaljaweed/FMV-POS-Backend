@@ -6,32 +6,32 @@ import { Product } from "../modal/product.modal.js";
 import { User } from "../modal/user.modal.js";
 const createBooking = asyncHandler(async (req, res) => {
   const {
+    productId,
+    bookingDate,
     name,
     startTime,
     endTime,
     totalGuest,
     message,
     email,
-    productId,
-    bookingDate,
   } = req.body;
   if (
+    !productId ||
+    !bookingDate ||
     !name ||
     !startTime ||
     !endTime ||
     !totalGuest ||
     !message ||
-    !email ||
-    !productId ||
-    !bookingDate
+    !email
   ) {
     throw new ApiError(401, "Please fill all the fields");
   }
   const userId = req.user._id;
   const existingBooking = await Booking.findOne({
     userId,
-    productId,
     bookingDate: { $gte: new Date() },
+    productId,
   });
   console.log(userId, "User Id");
 

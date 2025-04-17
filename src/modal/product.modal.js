@@ -11,6 +11,12 @@ const productSchema = new mongoose.Schema(
       enum: ["farm house", "hall", "banquet", "villas", "murqee", "resturant"],
       required: true,
     },
+
+    pics: {
+      type: [String],
+      required: true,
+    },
+
     price: {
       type: Number,
       required: true,

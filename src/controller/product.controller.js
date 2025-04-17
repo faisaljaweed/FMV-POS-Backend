@@ -2,6 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Product } from "../modal/product.modal.js";
+import fs from "fs";
+import { uploadCloudinary } from "../utils/cloudinary.js";
 const addProduct = asyncHandler(async (req, res) => {
   const {
     VenuName,
@@ -12,7 +14,7 @@ const addProduct = asyncHandler(async (req, res) => {
     standingCapacity,
     seatedCapacity,
     size,
-    // features,
+    features,
   } = req.body;
   console.log(req.body);
 
@@ -24,15 +26,42 @@ const addProduct = asyncHandler(async (req, res) => {
     !type ||
     !standingCapacity ||
     !seatedCapacity ||
-    !size
-    // !features
+    !size ||
+    !features
   ) {
     throw new ApiError(401, "All Fields are required");
   }
 
+  if (!req.files || !req.files.pics || !req.files.pics.length === 0) {
+    throw new ApiError(400, "At least one image file is required");
+  }
+  const uploadedPics = await Promise.all(
+    req.files.pics.map(async (file) => {
+      const result = await uploadCloudinary(file.path);
+      // fs.unlinkSync(file.path, (err) => {
+      //   if (err) {
+      //     console.error("File Deletion Error:", err);
+      //   } else {
+      //     console.log("File deleted successfully");
+      //   }
+      // });
+      try {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      } catch (deleteErr) {
+        console.error("File delete karte waqt error:", deleteErr);
+      }
+      if (!result || !result.url) {
+        throw new ApiError(500, "Failed to upload image to Cloudinary");
+      }
+      return result.url;
+    })
+  );
   const property = await Product.create({
     VenuName,
     vendorId: req.user._id,
+    pics: uploadedPics,
     description,
     location,
     price,
@@ -40,7 +69,7 @@ const addProduct = asyncHandler(async (req, res) => {
     standingCapacity,
     seatedCapacity,
     size,
-    // features,
+    features,
   });
 
   res

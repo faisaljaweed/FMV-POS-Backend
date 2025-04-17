@@ -8,11 +8,18 @@ cloudinary.config({
 
 const uploadCloudinary = async (localfilePath) => {
   try {
-    if (localfilePath) return null;
+    if (!localfilePath) return null;
     const uploadResult = await cloudinary.uploader.upload(localfilePath, {
       resource_type: "auto",
     });
-    if (fs.existsSync(localfilePath)) fs.unlinkSync(localfilePath);
+    try {
+      if (fs.existsSync(localfilePath)) {
+        fs.unlinkSync(localfilePath);
+      }
+    } catch (deleteErr) {
+      console.error("File delete karte waqt error:", deleteErr);
+    }
+
     return uploadResult;
   } catch (error) {
     if (fs.existsSync(localfilePath)) {
@@ -23,4 +30,4 @@ const uploadCloudinary = async (localfilePath) => {
   }
 };
 
-export default { uploadCloudinary };
+export { uploadCloudinary };

@@ -14,3 +14,4 @@ connectDB()
   .catch((err) => {
     console.log(`Mongodb Connection failed ${err}`);
   });
+export default app;

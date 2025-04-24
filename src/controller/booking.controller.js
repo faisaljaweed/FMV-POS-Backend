@@ -13,7 +13,15 @@ const createBooking = asyncHandler(async (req, res) => {
     endTime,
     totalGuest,
     message,
-    email,
+    contactNumber,
+    type,
+    paymentStatus,
+    advancePaid,
+    totalPrice,
+    specialRequest,
+    farmHouseDetails,
+    banquetDetails,
+    villasDetails,
   } = req.body;
   if (
     !productId ||
@@ -23,9 +31,20 @@ const createBooking = asyncHandler(async (req, res) => {
     !endTime ||
     !totalGuest ||
     !message ||
-    !email
+    !contactNumber ||
+    !type ||
+    !paymentStatus
   ) {
     throw new ApiError(401, "Please fill all the fields");
+  }
+  if (type === "farm house" && !farmHouseDetails) {
+    throw new ApiError(401, "Farmhouse details required for this booking type");
+  }
+  if (type === "banquet" && !banquetDetails) {
+    throw new ApiError(401, "Banquet Details required for this booking type");
+  }
+  if (type === "villas" && !villasDetails) {
+    throw new ApiError(401, "Villas Details required for this booking type");
   }
   const userId = req.user._id;
   const existingBooking = await Booking.findOne({
@@ -54,7 +73,16 @@ const createBooking = asyncHandler(async (req, res) => {
     endTime,
     totalGuest,
     message,
-    email,
+    contactNumber,
+    type,
+    paymentStatus,
+    advancePaid: advancePaid || 0,
+    totalPrice: totalPrice || 0,
+    specialRequest,
+    status: "pending",
+    farmHouseDetails,
+    banquetDetails,
+    villasDetails,
     vendorId: product.vendorId,
     status: "pending",
   });
